@@ -4,176 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoClip Studio</title>
-    <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Body Styling */
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #fff;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Container Styling */
-        .container {
-            max-width: 500px;
-            width: 90%;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 0 15px 4px #00ffcc;
-            border-radius: 15px;
-            text-align: center;
-        }
-
-        /* Logo Styling */
-        .logo {
-            max-width: 100px;
-            margin: 0 auto 15px;
-        }
-
-        /* Header Styling */
-        h1 {
-            font-size: 2.5rem;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        p {
-            margin-bottom: 20px;
-            color: #ddd;
-        }
-
-        /* Form Styling */
-        label {
-            display: block;
-            text-align: left;
-            margin: 10px 0 5px;
-            color: #00ffcc;
-        }
-
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 2px solid #00ffcc;
-            border-radius: 5px;
-            background: transparent;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s ease-in-out;
-        }
-
-        input:hover, button:hover {
-            border-color: #ff007f;
-            box-shadow: 0 0 10px #ff007f;
-        }
-
-        button {
-            background: #00ffcc;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #ff007f;
-            color: #fff;
-            text-shadow: 0 0 5px #fff;
-        }
-
-        .status {
-            font-size: 1rem;
-            margin-top: 10px;
-            color: #00ffcc;
-            display: none;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-            .container {
-                padding: 15px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Logo Section -->
-        <img src="logo.png" alt="AutoClip Studio Logo" class="logo">
-        
-        <!-- Title -->
-        <h1>AutoClip Studio</h1>
-        <p>Create AI-powered Reaction Videos in seconds!</p>
-
-        <!-- Form -->
-        <form id="reactionForm">
-            <label for="userID">UserID:</label>
-            <input type="text" id="userID" name="userID" placeholder="Enter your UserID" required>
-
-            <label for="reactionVideoURL">Reaction Video URL:</label>
-            <input type="url" id="reactionVideoURL" name="reactionVideoURL" placeholder="Paste the video URL" required>
-
-            <p><strong>Important Notes:</strong> 📱 Videos must be in **Vertical/Portrait** resolution. 🚫 Landscape videos might not work as expected.</p>
-            
-            <button type="submit">Generate Video 🎥</button>
-        </form>
-
-        <!-- Status Message -->
-        <p id="statusMessage" class="status">Video request submitted!</p>
-    </div>
+    <h1>Your Video</h1>
+    <p id="statusMessage">Waiting for video URL...</p>
 
     <script>
-        document.getElementById('reactionForm').addEventListener('submit', async function (e) {
-            e.preventDefault(); // Prevent default form submission
-
-            // Collect input values
-            const userID = document.getElementById('userID').value;
-            const reactionVideoURL = document.getElementById('reactionVideoURL').value;
-
-            // Prepare JSON data
-            const data = {
-                userID: userID,
-                reactionVideoURL: reactionVideoURL
-            };
-
+        // Fetch the video URL from the serverless function
+        async function fetchGeneratedVideo(videoId) {
             try {
-                // Send POST request to webhook
-                const response = await fetch('https://hook.eu2.make.com/mlvbhz9y342792qun3pjhjf2bhdf2gzu', {
+                const response = await fetch('/.netlify/functions/sendVideoURL', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({ videoURL: `https://your-storage-path/video.mp4` })
                 });
 
-                // Check response and update UI
                 if (response.ok) {
-                    document.getElementById('statusMessage').innerText = 'Video request submitted!';
-                    document.getElementById('statusMessage').style.display = 'block';
+                    const data = await response.json();
+                    document.getElementById('statusMessage').innerHTML = `
+                        <p>🎉 Your video is ready! Watch it <a href="${data.videoURL}" target="_blank">here</a>.</p>
+                    `;
                 } else {
-                    document.getElementById('statusMessage').innerText = 'Submission failed. Please try again.';
-                    document.getElementById('statusMessage').style.display = 'block';
+                    console.error('Failed to fetch video URL.');
                 }
             } catch (error) {
-                console.error('Error submitting the form:', error);
-                document.getElementById('statusMessage').innerText = 'An error occurred. Please try again.';
-                document.getElementById('statusMessage').style.display = 'block';
+                console.error('Error fetching video URL:', error);
             }
-        });
+        }
+
+        // Example: Call the function after the video is generated
+        fetchGeneratedVideo();
     </script>
 </body>
 </html>
