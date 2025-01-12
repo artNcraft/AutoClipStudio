@@ -35,11 +35,16 @@
             text-align: center;
         }
 
+        /* Logo Styling */
+        .logo {
+            max-width: 100px;
+            margin: 0 auto 15px;
+        }
+
         /* Header Styling */
         h1 {
             font-size: 2.5rem;
-            color: #00ffcc;
-            text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+            color: #fff;
             margin-bottom: 10px;
         }
 
@@ -69,13 +74,13 @@
             transition: 0.3s ease-in-out;
         }
 
+        input[type="file"] {
+            padding: 5px;
+        }
+
         input:hover, button:hover {
             border-color: #ff007f;
             box-shadow: 0 0 10px #ff007f;
-        }
-
-        input[type="file"] {
-            padding: 5px;
         }
 
         button {
@@ -94,7 +99,11 @@
         .note {
             font-size: 14px;
             color: #999;
-            margin: -10px 0 15px;
+            margin: -5px 0 10px;
+        }
+
+        .spacing-fix {
+            margin-bottom: 25px; /* Added extra space to prevent overlap */
         }
 
         /* Responsive Design */
@@ -110,14 +119,20 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎬 AutoClip Studio</h1>
+        <!-- Logo Section -->
+        <img src="logo.png" alt="AutoClip Studio Logo" class="logo">
+        
+        <!-- Title -->
+        <h1>AutoClip Studio</h1>
         <p>Create AI-powered Reaction Videos in seconds!</p>
-        <form action="https://example.com/submit" method="post" enctype="multipart/form-data">
+
+        <!-- Form -->
+        <form action="https://hook.eu2.make.com/w46egexl98f5kbrkbviyl1o97gpsgl16" method="post" enctype="multipart/form-data">
             <label for="userID">UserID:</label>
             <input type="text" id="userID" name="userID" placeholder="Enter your UserID" required>
 
-            <label for="reactionVideo">Reaction Video URL/File:</label>
-            <input type="url" id="reactionVideoURL" name="reactionVideoURL" placeholder="Paste the video URL">
+            <label for="reactionVideo">Reaction Video URL:</label>
+            <input type="url" id="reactionVideoURL" name="reactionVideoURL" placeholder="Paste the video URL" class="spacing-fix">
             <span class="note">OR</span>
             <input type="file" id="reactionVideoFile" name="reactionVideoFile" accept="video/*">
 
