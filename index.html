@@ -74,10 +74,6 @@
             transition: 0.3s ease-in-out;
         }
 
-        input[type="file"] {
-            padding: 5px;
-        }
-
         input:hover, button:hover {
             border-color: #ff007f;
             box-shadow: 0 0 10px #ff007f;
@@ -96,14 +92,11 @@
             text-shadow: 0 0 5px #fff;
         }
 
-        .note {
-            font-size: 14px;
-            color: #999;
-            margin: -5px 0 10px;
-        }
-
-        .spacing-fix {
-            margin-bottom: 25px; /* Added extra space to prevent overlap */
+        .status {
+            font-size: 1rem;
+            margin-top: 10px;
+            color: #00ffcc;
+            display: none;
         }
 
         /* Responsive Design */
@@ -127,19 +120,57 @@
         <p>Create AI-powered Reaction Videos in seconds!</p>
 
         <!-- Form -->
-        <form action="https://hook.eu2.make.com/w46egexl98f5kbrkbviyl1o97gpsgl16" method="post" enctype="multipart/form-data">
+        <form id="reactionForm">
             <label for="userID">UserID:</label>
             <input type="text" id="userID" name="userID" placeholder="Enter your UserID" required>
 
-            <label for="reactionVideo">Reaction Video URL:</label>
-            <input type="url" id="reactionVideoURL" name="reactionVideoURL" placeholder="Paste the video URL" class="spacing-fix">
-            <span class="note">OR</span>
-            <input type="file" id="reactionVideoFile" name="reactionVideoFile" accept="video/*">
+            <label for="reactionVideoURL">Reaction Video URL:</label>
+            <input type="url" id="reactionVideoURL" name="reactionVideoURL" placeholder="Paste the video URL" required>
 
             <p><strong>Important Notes:</strong> 📱 Videos must be in **Vertical/Portrait** resolution. 🚫 Landscape videos might not work as expected.</p>
             
             <button type="submit">Generate Video 🎥</button>
         </form>
+
+        <!-- Status Message -->
+        <p id="statusMessage" class="status">Video request submitted!</p>
     </div>
+
+    <script>
+        document.getElementById('reactionForm').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // Collect input values
+            const userID = document.getElementById('userID').value;
+            const reactionVideoURL = document.getElementById('reactionVideoURL').value;
+
+            // Prepare JSON data
+            const data = {
+                userID: userID,
+                reactionVideoURL: reactionVideoURL
+            };
+
+            try {
+                // Send POST request to webhook
+                const response = await fetch('https://hook.eu2.make.com/w46egexl98f5kbrkbviyl1o97gpsgl16', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                // Show status message
+                if (response.ok) {
+                    document.getElementById('statusMessage').style.display = 'block';
+                } else {
+                    alert('Failed to submit. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting the form:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    </script>
 </body>
 </html>
