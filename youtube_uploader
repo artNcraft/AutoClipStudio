@@ -1,0 +1,39 @@
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+
+class YouTubeUploader:
+    def __init__(self):
+        self.youtube = None
+
+    def set_credentials(self, credentials):
+        self.youtube = build("youtube", "v3", credentials=credentials)
+
+    def upload_video(self, file_path, title, description, tags, privacy_status):
+        if not self.youtube:
+            return None
+
+        body = {
+            "snippet": {
+                "title": title,
+                "description": description,
+                "tags": tags.split(","),
+                "categoryId": "22"
+            },
+            "status": {
+                "privacyStatus": privacy_status
+            }
+        }
+
+        media = MediaFileUpload(file_path, resumable=True)
+
+        try:
+            request = self.youtube.videos().insert(
+                part="snippet,status",
+                body=body,
+                media_body=media
+            )
+            response = request.execute()
+            return response.get("id")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
