@@ -22,9 +22,10 @@ def login_with_google():
 def handle_oauth_callback(code):
     tokens = oauth_handler.exchange_code_for_tokens(code)
     if tokens:
-        return gr.update(visible=True), "Authentication successful!"
+        youtube_uploader.set_credentials(oauth_handler.get_credentials(tokens))
+        return gr.update(visible=True), gr.update(visible=False), "Authentication successful!"
     else:
-        return gr.update(visible=False), "Authentication failed."
+        return gr.update(visible=False), gr.update(visible=True), "Authentication failed."
 
 def upload_video(file, title, description, tags, privacy):
     video_id = youtube_uploader.upload_video(file.name, title, description, tags, privacy)
@@ -36,20 +37,24 @@ def upload_video(file, title, description, tags, privacy):
 with gr.Blocks() as app:
     gr.Markdown("# AutoClip Studio")
     
-    with gr.Tab("Signup"):
-        userid_input = gr.Textbox(label="User ID")
-        email_input = gr.Textbox(label="Email")
-        signup_button = gr.Button("Sign Up")
-        signup_message = gr.Textbox(label="Message", interactive=False)
-        
-    with gr.Tab("Login"):
-        google_login_button = gr.Button("Login with Google")
-        auth_url_output = gr.Textbox(label="Authorization URL", interactive=False)
-        code_input = gr.Textbox(label="Enter the authorization code")
-        submit_code_button = gr.Button("Submit Code")
-        auth_message = gr.Textbox(label="Authentication Message", interactive=False)
-    
-    with gr.Tab("Upload Video", visible=False) as upload_tab:
+    with gr.Tab("User Management"):
+        with gr.Box():
+            gr.Markdown("## Sign Up")
+            userid_input = gr.Textbox(label="User ID")
+            email_input = gr.Textbox(label="Email")
+            signup_button = gr.Button("Sign Up")
+            signup_message = gr.Textbox(label="Message", interactive=False)
+
+        with gr.Box():
+            gr.Markdown("## Login with Google")
+            google_login_button = gr.Button("Login with Google")
+            auth_url_output = gr.Textbox(label="Authorization URL", interactive=False)
+            code_input = gr.Textbox(label="Enter the authorization code")
+            submit_code_button = gr.Button("Submit Code")
+            auth_message = gr.Textbox(label="Authentication Message", interactive=False)
+
+    with gr.Tab("Video Upload") as upload_tab:
+        gr.Markdown("## Upload Video to YouTube")
         file_input = gr.File(label="Select Video File")
         title_input = gr.Textbox(label="Video Title")
         description_input = gr.Textbox(label="Video Description")
@@ -57,10 +62,10 @@ with gr.Blocks() as app:
         privacy_input = gr.Dropdown(["public", "private", "unlisted"], label="Privacy Setting")
         upload_button = gr.Button("Upload Video")
         upload_message = gr.Textbox(label="Upload Message", interactive=False)
-    
-    signup_button.click(signup, inputs=[userid_input, email_input], outputs=[upload_tab, gr.Tab("Signup"), signup_message])
+
+    signup_button.click(signup, inputs=[userid_input, email_input], outputs=[upload_tab, gr.Tab("User Management"), signup_message])
     google_login_button.click(login_with_google, outputs=auth_url_output)
-    submit_code_button.click(handle_oauth_callback, inputs=code_input, outputs=[upload_tab, auth_message])
+    submit_code_button.click(handle_oauth_callback, inputs=code_input, outputs=[upload_tab, gr.Tab("User Management"), auth_message])
     upload_button.click(upload_video, inputs=[file_input, title_input, description_input, tags_input, privacy_input], outputs=upload_message)
 
 if __name__ == "__main__":
